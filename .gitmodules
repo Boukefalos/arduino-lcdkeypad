@@ -1,0 +1,6 @@
+[submodule "protobuf"]
+	path = protobuf
+	url = https://github.com/google/protobuf.git
+[submodule "nanopb"]
+	path = nanopb
+	url = https://code.google.com/p/nanopb/
