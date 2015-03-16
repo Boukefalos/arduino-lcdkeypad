@@ -4,3 +4,6 @@
 [submodule "nanopb"]
 	path = nanopb
 	url = https://code.google.com/p/nanopb/
+[submodule "lib/TM1638"]
+	path = lib/TM1638
+	url = https://github.com/Boukefalos/tm1638-library.git
