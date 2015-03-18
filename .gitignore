@@ -1,2 +1,8 @@
 /.pioenvs
 /.sconsign.dblite
+/src/*.pb.h
+/src/*.pb.c
+/src/pb_*.h
+/src/pb_*.c
+/src/pb.h
+/*.pb

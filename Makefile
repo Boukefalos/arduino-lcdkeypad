@@ -3,7 +3,7 @@ GOOGLE_PROTOBUF_INCLUDES = protobuf/src
 NANOPB_DIR = nanopb/generator
 PROTO_INCLUDES = -I$(PROTO_DIR) -I$(GOOGLE_PROTOBUF_INCLUDES) -I$(NANOPB_DIR)/proto
 
-all: nanopb beerduino.pb
+all: nanopb tm1638.pb
 
 nanopb: nanopb_nanopb nanopb_plugin
 	cp nanopb/pb.h src
@@ -22,3 +22,6 @@ nanopb_%: $(NANOPB_DIR)/proto/%.proto
 	python $(NANOPB_DIR)/nanopb_generator.py $@ -L '#include "%s"'
 	mv -f $@.h src
 	mv -f $@.c src
+
+run:
+	platformio run
