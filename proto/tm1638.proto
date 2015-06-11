@@ -17,15 +17,22 @@ enum Module {
 
 message Command {
     enum Type {
-        PING = 1;
-        CONSTRUCT = 2;
-        SET_LED = 10;
+    	SERVER = 1;
+        PING = 2;
+        CONSTRUCT = 3;
+        SET_LED = 4;
     }
 
     required Type type = 1;
-    optional Ping ping = 2;
-    optional Construct construct = 3;
-    optional SetLed setLed = 10;
+    optional Server server = 2;
+    optional Ping ping = 3;
+    optional Construct construct = 4;
+    optional SetLed setLed = 5;
+}
+
+message Server {
+	optional string host = 1;
+	required int32 port = 2;
 }
 
 message Ping {
@@ -34,7 +41,7 @@ message Ping {
 
 message Echo {
     required int32 id = 1;
-    optional string message = 2;// [(nanopb).max_size = 40];
+    optional string message = 2 [(nanopb).max_size = 40];
 }
 
 message Construct {
@@ -51,4 +58,8 @@ message SetLed {
     required Color color = 1;
     required int32 pos = 2;
     optional int32 id = 3 [default = 1];
+}
+
+message Buttons {
+    required byte buttons;
 }

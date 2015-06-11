@@ -8,7 +8,6 @@
 extern "C" {
     #include "pb_decode.h"
     #include "pb_encode.h"
-    #include "beerduino.pb.h"
     #include "tm1638.pb.h"
 }
 
@@ -17,15 +16,25 @@ TM1638 *tm1638[6];
 TM16XX *module;
 
 int t = 123;
-int id;
+int id = 0;
+byte pressed = 0;
 _tm1638_Construct construct;
 
 void setup() {
-    Serial.begin(9600);    
+    Serial.begin(9600);
+    tm1638[0] = new TM1638(8, 9, 7);
+    tm1638[0]->setupDisplay(true, 1);
+    tm1638[0]->setLED(TM1638_COLOR_RED, 2);
+    tm1638[0]->setDisplayToDecNumber(111, 0);
 }
 
-void loop() {
-
+void sendButtons(int id, byte buttons) {
+    /*_tm1638_Buttons x = {id, buttons};
+    uint8_t out_buffer[256];
+    pb_ostream_t ostream = pb_ostream_from_buffer(out_buffer, sizeof(out_buffer));
+    if (pb_encode_delimited(&ostream, tm1638_Buttons_fields, &x)) {
+        Serial.write(out_buffer, ostream.bytes_written);
+    }*/
 }
 
 void sendEcho(int id, char message[]) {
@@ -38,8 +47,17 @@ void sendEcho(int id, char message[]) {
     }
 }
 
+void loop() {
+    byte buttons = tm1638[0]->getButtons();
+    if (buttons != pressed) {
+        //sendButtons(0, buttons);
+        sendEcho(buttons, "Buttons!");
+        pressed = buttons;
+    }
+}
+
 void serialEvent() {
-    if(Serial.available()) {
+    if (Serial.available()) {
         int packet_size = Serial.read();
         uint8_t in_buffer[256];
         int bytes_read = Serial.readBytes((char*) in_buffer, packet_size);
@@ -56,18 +74,16 @@ void serialEvent() {
             case tm1638_Command_Type_PING:
                 if (command.has_ping) {
                     _tm1638_Ping ping = command.ping;
-                    sendEcho(ping.id, "Pong");                    
+                    sendEcho(ping.id, "Pong");
                     tm1638[0]->setDisplayToDecNumber(ping.id, 0);
                 }
                 break;
             case tm1638_Command_Type_CONSTRUCT:
                 construct = command.construct;
                 id = construct.id;
-                sendEcho(0, "ID:");   
                 switch (construct.module) {
                     case tm1638_Module_TM1638:
                         tm1638[0] = new TM1638((byte) construct.dataPin, (byte) construct.clockPin, (byte) construct.strobePin, construct.activateDisplay, (byte) construct.intensity);
-                        // tm1638[0] = new TM1638(8, 9, 7);
                         tm1638[0]->setupDisplay(true, 1);
                         break;
                     case tm1638_Module_InvertedTM1638:
