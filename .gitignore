@@ -6,3 +6,5 @@
 /src/pb_*.c
 /src/pb.h
 /*.pb
+/venv
+/protoc.exe
