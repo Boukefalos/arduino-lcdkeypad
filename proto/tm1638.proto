@@ -17,49 +17,117 @@ enum Module {
 
 message Command {
     enum Type {
-    	SERVER = 1;
-        PING = 2;
-        CONSTRUCT = 3;
-        SET_LED = 4;
+        PING = 1;
+        CONSTRUCT = 2;
+        CLEAR_DISPLAY = 3;
+        CLEAR_DISPLAY_DIGIT = 4;
+        SET_DISPLAY = 5;
+        SET_DISPLAY_DIGIT = 6;
+        SET_DISPLAY_TO_BIN_NUMBER = 7;
+        SET_DISPLAY_TO_DEC_NUMBER = 8;        
+        SET_DISPLAY_TO_HEX_NUMBER = 9;
+        SET_DISPLAY_TO_ERROR = 10;
+        SET_DISPLAY_TO_STRING = 11;
+        SET_LED = 12;
+        SET_LEDS = 13;
+        SETUP_DISPLAY = 14;
     }
 
     required Type type = 1;
-    optional Server server = 2;
-    optional Ping ping = 3;
-    optional Construct construct = 4;
-    optional SetLed setLed = 5;
-}
-
-message Server {
-	optional string host = 1;
-	required int32 port = 2;
+    optional Ping ping = 2;
+    optional Construct construct = 3;
+    optional ClearDisplayDigit clearDisplayDigit = 4;
+	optional SetDisplay setDisplay = 5;
+	optional SetDisplayDigit setDisplayDigit = 6;
+	optional SetDisplayToNumber setDisplayToNumber = 7;
+	optional SetDisplayToString setDisplayToString = 8;
+    optional SetLED setLED = 9;
+    optional SetLEDs setLEDs = 10;
+    optional SetupDisplay setupDisplay = 11;
 }
 
 message Ping {
     required int32 id = 1;
 }
 
-message Echo {
-    required int32 id = 1;
-    optional string message = 2 [(nanopb).max_size = 40];
-}
-
 message Construct {
 	required int32 dataPin = 1;
 	required int32 clockPin = 2;
 	optional int32 strobePin = 3;
-    optional bool activateDisplay = 4 [default = true];
-    optional int32 intensity = 5 [default = 7];
     optional Module module = 6 [default = TM1638];
     optional int32 id = 7 [default = 0];
 }
 
-message SetLed {
+message ClearDisplayDigit {
+	required int32 pos = 1;
+	required bool dot = 2;
+}
+
+message SetDisplay {
+	required bytes values = 1;
+}
+
+message SetDisplayDigit {
+	required int32 digit = 1;	
+	required int32 pos = 2;
+	required bool dot = 3;
+	required bool has_font = 4;
+	optional bytes font = 5;
+}
+
+message SetDisplayToNumber {
+	required sint32 number = 1;
+	required int32 dots = 2;
+	required bool has_font = 3;
+	optional bytes font = 4;
+	optional bool leadingZeros = 5 [default = false];
+	optional bool sign = 6 [default = true];
+}
+
+message SetDisplayToString {
+	required string string = 1  [(nanopb).max_size = 40];	
+	required int32 dots = 2;
+	required int32 pos = 3;
+	required bool has_font = 4;
+	optional bytes font = 5;
+}
+
+message SetLED {
     required Color color = 1;
     required int32 pos = 2;
     optional int32 id = 3 [default = 1];
 }
 
+message SetLEDs {
+	required int32 led = 1;
+}
+
+message SetupDisplay {
+    optional bool active = 1 [default = true];
+    optional int32 intensity = 2 [default = 7];
+}
+
+message Message {
+	enum Type {
+		PONG = 1;
+		BUTTONS = 2;
+		TEXT = 3;
+	}
+
+    required Type type = 1;
+	optional Pong pong = 2;
+	optional Buttons buttons = 3;
+	optional Text text = 4;
+}
+
+message Pong {
+    required int32 id = 1;
+}
+
 message Buttons {
-    required byte buttons;
+    required int32 buttons = 1;
+}
+
+message Text {
+    required string text = 1 [(nanopb).max_size = 40];
 }
