@@ -15,7 +15,6 @@ TM1640 *tm1640;
 TM1638 *tm1638[6];
 TM16XX *module;
 
-tm1638_Construct construct;
 int pong = 0;
 String text;
 byte pressed = 0;
@@ -104,14 +103,17 @@ bool callbackFont(pb_istream_t *stream, const pb_field_t *field, void **arg) {
 void setup() {
     tm1638[0] = new TM1638(8, 9, 7);
     tm1638[0]->setupDisplay(true, 1);
-    tm1638[0]->setDisplayToError();
+    tm1638[0]->setDisplayToString("Ready", 0, 0);
+    // tm1638[0]->setDisplayToError();
 
-    Serial.begin(19200);
-    sendText("setup()");
+    Serial.begin(4800);
+    Serial.println("");
+    //sendText("setup()");
+    Serial.println("setup()");
 }
 
 void loop() {
-    if (pong > 0) {        
+    /*if (pong > 0) {        
         sendPong(pong);
         pong = 0;
     }
@@ -123,7 +125,7 @@ void loop() {
     if (buttons != pressed) {
         sendButtons(buttons);
         pressed = buttons;
-    }
+    }*/
 }
 
 void serialEvent() {
@@ -132,38 +134,41 @@ void serialEvent() {
         uint8_t in_buffer[256];
         int bytes_read = Serial.readBytes((char*) in_buffer, packet_size);
         if (bytes_read != packet_size) {
+            Serial.println("length problem");
             return;
         }
         pb_istream_t istream = pb_istream_from_buffer(in_buffer, bytes_read);
         _tm1638_Command command;
         if (!pb_decode(&istream, tm1638_Command_fields, &command)) {
+            Serial.println("decode problem");
             return;
         }
 
         // tm1638[0]->setDisplayDigit(command.type / 10, 0, false);
         // tm1638[0]->setDisplayDigit(command.type, 1, false);
-
+        Serial.println("command");
+        Serial.println(command.type);
         switch (command.type) {
             case tm1638_Command_Type_PING:
                 if (command.has_ping) {
                     tm1638_Ping ping = command.ping;
                     tm1638[0]->setDisplayToDecNumber(ping.id, 0, false);
                     pong = ping.id;
-                }
+                    }
                 break;
             case tm1638_Command_Type_CONSTRUCT:
                     if (command.has_construct) {
-                    construct = command.construct;
-                    switch (construct.module) {
-                        case tm1638_Module_TM1638:
-                            tm1638[0] = new TM1638((byte) construct.dataPin, (byte) construct.clockPin, (byte) construct.strobePin);
-                            break;
-                        case tm1638_Module_InvertedTM1638:
-                            tm1638[0] = new InvertedTM1638((byte) construct.dataPin, (byte) construct.clockPin, (byte) construct.strobePin);
-                            break;
-                        case tm1638_Module_TM1640:
-                            tm1640 = new TM1640((byte) construct.dataPin, (byte) construct.clockPin);
-                            break;
+                        tm1638_Construct construct = command.construct;
+                        switch (construct.module) {
+                            case tm1638_Module_TM1638:
+                                tm1638[0] = new TM1638((byte) construct.dataPin, (byte) construct.clockPin, (byte) construct.strobePin);
+                                break;
+                            case tm1638_Module_InvertedTM1638:
+                                tm1638[0] = new InvertedTM1638((byte) construct.dataPin, (byte) construct.clockPin, (byte) construct.strobePin);
+                                break;
+                            case tm1638_Module_TM1640:
+                                tm1640 = new TM1640((byte) construct.dataPin, (byte) construct.clockPin);
+                                break;
                     }
                 }
                 break;
@@ -256,7 +261,8 @@ void serialEvent() {
                 tm1638[0]->setDisplayToError();
                 break;
             case tm1638_Command_Type_SET_DISPLAY_TO_STRING:
-                if(command.has_setDisplayToString) {
+                if (command.has_setDisplayToString) {
+                    text = "SET_DISPLAY_TO_STRING";
                     tm1638_SetDisplayToString setDisplayToString = command.setDisplayToString;
                     pb_decode(&istream, tm1638_SetDisplayToString_fields, &setDisplayToString);
                     byte dots = setDisplayToString.dots;
@@ -268,8 +274,8 @@ void serialEvent() {
                         if (pb_decode(&istream, tm1638_SetDisplayToString_fields, &setDisplayToString)) {
                             tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos, font);
                         }
-                    } else {
-                        tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos);
+                    } else { // setDisplayToString.string
+                        tm1638[0]->setDisplayToString("test...", dots, pos);
                     }
                 }
                 break;
