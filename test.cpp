@@ -8,17 +8,17 @@ extern "C" {
     #include "tm1638.pb.h"
 }
 
+#define BUFFER_SIZE 256
+
 bool callbackFont(pb_istream_t *stream, const pb_field_t *field, void **arg) {
-    uint8_t buffer[256] = {0};
+    memset(*arg, 0, BUFFER_SIZE);
     int length = stream->bytes_left;
-    if (length > sizeof(buffer) - 1) {
+    if (length > BUFFER_SIZE - 1) {
         return false;
     }
-    if (!pb_read(stream, buffer, length)) {
+    if (!pb_read(stream, (uint8_t*) *arg, length)) {
         return false;
-    }    
-    memset(*arg, 0, sizeof(buffer));
-    strncpy((char*) *arg, (char*) buffer, length);
+    }
     return true;
 }
 
@@ -26,7 +26,7 @@ int main() {
     FILE *fp = fopen("test.buffer", "r");
 
     int packet_size = fgetc(fp);
-    uint8_t in_buffer[256];
+    uint8_t in_buffer[BUFFER_SIZE];
     int bytes_read = fread((char*) in_buffer, 1, packet_size, fp);
     if (bytes_read != packet_size) {
         printf("length problem");
