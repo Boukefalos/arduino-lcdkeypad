@@ -25,3 +25,6 @@ nanopb_%: $(NANOPB_DIR)/proto/%.proto
 
 run:
 	platformio run
+    
+test:
+	g++ src/pb_common.c src/pb_decode.c src/pb_encode.c src/tm1638.pb.c test.cpp -o test -Isrc
