@@ -267,12 +267,14 @@ void serialEvent() {
                     pb_decode(&istream, tm1638_SetDisplayToString_fields, &setDisplayToString);
                     byte dots = setDisplayToString.dots;
                     byte pos = setDisplayToString.dots;
-                    tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos);                  
+                    // tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos);                  
+                    tm1638[0]->setDisplayToString("TODO", dots, pos);                  
                     bool has_font = setDisplayToString.has_font;
                     if (has_font) {
                         setDisplayToString.font.funcs.decode = &callbackFont;
                         if (pb_decode(&istream, tm1638_SetDisplayToString_fields, &setDisplayToString)) {
-                            tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos, font);
+                            // tm1638[0]->setDisplayToString(setDisplayToString.string, dots, pos, font);
+                            tm1638[0]->setDisplayToString("TODO", dots, pos, font);
                         }
                     } else { // setDisplayToString.string
                         tm1638[0]->setDisplayToString("test...", dots, pos);
