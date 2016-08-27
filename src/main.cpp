@@ -1,26 +1,17 @@
-// #include <stdint.h>
 #include "Arduino.h"
 
-// extern "C" {
-    // #include "pb_decode.h"
-    // #include "pb_encode.h"
-    // #include "tm1638.pb.h"
-// }
+extern "C" {
+    #include "pb_decode.h"
+    #include "pb_encode.h"
+    #include "lcdkeypad.pb.h"
+}
 
-//Sample using LiquidCrystal library
 #include <LiquidCrystal.h>
 
-/*******************************************************
-
-This program will test the LCD panel and the buttons
-Mark Bramwell, July 2010
-
-********************************************************/
-
-// select the pins used on the LCD panel
+// Select the pins used on the LCD panel
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-// define some values used by the panel and buttons
+// Define some values used by the panel and buttons
 int lcd_key     = 0;
 int adc_key_in  = 0;
 #define btnRIGHT  0
@@ -30,81 +21,60 @@ int adc_key_in  = 0;
 #define btnSELECT 4
 #define btnNONE   5
 
-// read the buttons
-int read_LCD_buttons()
-{
- adc_key_in = analogRead(0);      // read the value from the sensor 
- // my buttons when read are centered at these valies: 0, 144, 329, 504, 741
- // we add approx 50 to those values and check to see if we are close
- if (adc_key_in > 1000) return btnNONE; // We make this the 1st option for speed reasons since it will be the most likely result
- // For V1.1 us this threshold
- // if (adc_key_in < 50)   return btnRIGHT;  
- // if (adc_key_in < 250)  return btnUP; 
- // if (adc_key_in < 450)  return btnDOWN; 
- // if (adc_key_in < 650)  return btnLEFT; 
- // if (adc_key_in < 850)  return btnSELECT;  
+// Read the buttons
+int read_LCD_buttons() {
+    // Read the value from the sensor 
+    adc_key_in = analogRead(0);
 
- // For V1.0 comment the other threshold and use the one below:
+    // Map buttons (v1.0 hardware)
+    if (adc_key_in > 1000) return btnNONE;
+    if (adc_key_in < 50)   return btnRIGHT;  
+    if (adc_key_in < 195)  return btnUP; 
+    if (adc_key_in < 380)  return btnDOWN; 
+    if (adc_key_in < 555)  return btnLEFT; 
+    if (adc_key_in < 790)  return btnSELECT;   
 
- if (adc_key_in < 50)   return btnRIGHT;  
- if (adc_key_in < 195)  return btnUP; 
- if (adc_key_in < 380)  return btnDOWN; 
- if (adc_key_in < 555)  return btnLEFT; 
- if (adc_key_in < 790)  return btnSELECT;   
-
-
-
- return btnNONE;  // when all others fail, return this...
+    return btnNONE;  // when all others fail, return this...
 }
 
-void setup()
-{
- lcd.begin(16, 2);              // start the library
- lcd.setCursor(0,0);
- lcd.print("Push the buttons"); // print a simple message
+void setup() {
+    lcd.begin(16, 2);
+    lcd.setCursor(0, 0);
+    lcd.print("Push the buttons");
 }
  
-void loop()
-{
- lcd.setCursor(9,1);            // move cursor to second line "1" and 9 spaces over
- lcd.print(millis()/1000);      // display seconds elapsed since power-up
+void loop() {
+    // Move cursor to second line "1" and 9 spaces over
+    lcd.setCursor(9, 1);            
 
+    // Display seconds elapsed since power-up
+    lcd.print(millis()/1000);      
 
- lcd.setCursor(0,1);            // move to the begining of the second line
- lcd_key = read_LCD_buttons();  // read the buttons
+    // Move to the start of the second line
+    lcd.setCursor(0, 1);         
 
- switch (lcd_key)               // depending on which button was pushed, we perform an action
- {
-   case btnRIGHT:
-     {
-     lcd.print("RIGHT ");
-     break;
-     }
-   case btnLEFT:
-     {
-     lcd.print("LEFT   ");
-     break;
-     }
-   case btnUP:
-     {
-     lcd.print("UP    ");
-     break;
-     }
-   case btnDOWN:
-     {
-     lcd.print("DOWN  ");
-     break;
-     }
-   case btnSELECT:
-     {
-     lcd.print("SELECT");
-     break;
-     }
-     case btnNONE:
-     {
-     lcd.print("NONE  ");
-     break;
-     }
- }
+    // Read the buttons
+    lcd_key = read_LCD_buttons();
 
+    // Print button status
+    switch (lcd_key) {
+        case btnRIGHT:
+            lcd.print("RIGHT ");
+            break;
+        case btnLEFT:
+            lcd.print("LEFT   ");
+            break;
+        case btnUP:
+            lcd.print("UP    ");
+            break;
+        case btnDOWN:
+            lcd.print("DOWN  ");
+            break;
+        case btnSELECT:
+            lcd.print("SELECT");
+            break;
+        case btnNONE:
+            lcd.print("NONE  ");
+            break;
+    }
 }

@@ -3,7 +3,7 @@ GOOGLE_PROTOBUF_INCLUDES = protobuf/src
 NANOPB_DIR = nanopb/generator
 PROTO_INCLUDES = -I$(PROTO_DIR) -I$(GOOGLE_PROTOBUF_INCLUDES) -I$(NANOPB_DIR)/proto
 
-all: nanopb tm1638.pb
+all: nanopb lcdkeypad.pb
 
 nanopb: nanopb_nanopb nanopb_plugin
 	cp nanopb/pb.h src
@@ -27,4 +27,4 @@ run:
 	platformio run
     
 test:
-	g++ src/pb_common.c src/pb_decode.c src/pb_encode.c src/tm1638.pb.c test.cpp -o test -Isrc
+	g++ src/pb_common.c src/pb_decode.c src/pb_encode.c src/lcdkeypad.pb.c test.cpp -o test -Isrc
