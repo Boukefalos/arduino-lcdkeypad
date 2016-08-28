@@ -1,16 +1,15 @@
 /*
-  LiquidCrystal Library - display() and noDisplay()
+  LiquidCrystal Library - setCursor
 
  Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
  library works with all LCD displays that are compatible with the
  Hitachi HD44780 driver. There are many of them out there, and you
  can usually tell them by the 16-pin interface.
 
- This sketch prints "Hello World!" to the LCD and uses the
- display() and noDisplay() functions to turn on and off
- the display.
+ This sketch prints to all the positions of the LCD using the
+ setCursor() method:
 
- The circuit:
+  The circuit:
  * LCD RS pin to digital pin 12
  * LCD Enable pin to digital pin 11
  * LCD D4 pin to digital pin 5
@@ -33,29 +32,40 @@
 
  This example code is in the public domain.
 
- http://www.arduino.cc/en/Tutorial/LiquidCrystalDisplay
+ http://www.arduino.cc/en/Tutorial/LiquidCrystalSetCursor
 
  */
 
 // include the library code:
+#include <Arduino.h>
 #include <LiquidCrystal.h>
 
+// these constants won't change.  But you can change the size of
+// your LCD using them:
+const int numRows = 2;
+const int numCols = 16;
+
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
 void setup() {
   // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("hello, world!");
+  lcd.begin(numCols, numRows);
 }
 
 void loop() {
-  // Turn off the display:
-  lcd.noDisplay();
-  delay(500);
-  // Turn on the display:
-  lcd.display();
-  delay(500);
+  // loop from ASCII 'a' to ASCII 'z':
+  for (int thisLetter = 'a'; thisLetter <= 'z'; thisLetter++) {
+    // loop over the columns:
+    for (int  thisRow = 0; thisRow < numRows; thisRow++) {
+      // loop over the rows:
+      for (int thisCol = 0; thisCol < numCols; thisCol++) {
+        // set the cursor position:
+        lcd.setCursor(thisCol, thisRow);
+        // print the letter:
+        lcd.write(thisLetter);
+        delay(200);
+      }
+    }
+  }
 }
-
